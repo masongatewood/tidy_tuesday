@@ -58,4 +58,9 @@ ww %>%
   summarize(lat_na = sum(is.na(LAT_WWTP)),
             lon_na = sum(is.na(LON_WWTP)))
 ```
+```{r}
+ww %>% 
+  ggplot(aes(x = LAT_WWTP, y = LON_WWTP)) + 
+  geom_point()
+```
 
