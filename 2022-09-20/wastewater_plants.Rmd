@@ -1,5 +1,5 @@
 ---
-title: "wastewater_plants"
+title: "Wastewater Plants"
 author: "Mason Gatewood"
 date: '2022-09-26'
 output: html_document
@@ -13,6 +13,49 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(tidytuesdayR)
 
-df <- tt_load('2022-09-20')
+tt <- tt_load('2022-09-20')
+
+ww <- tt$HydroWASTE_v10
+
+tt
+```
+
+```{r}
+glimpse(ww)
+```
+
+Check to make sure that all the wastewater treatment plants are unique
+```{r}
+ww %>% 
+  summarize(unique_count = n_distinct(WASTE_ID))
+```
+Looks like there are some unique names though
+```{r}
+ww %>% 
+  mutate(WWTP_NAME = toupper(WWTP_NAME)) %>% 
+  summarize(unique_names = n_distinct(WWTP_NAME))
+```
+Looks like a lot of repeating wastewater plants if going by name, but I'm not sure if they are definitely the same ones. My guess is that they just have the same name in the database but are actually different plants.
+
+```{r}
+ww %>% 
+  mutate(WWTP_NAME = toupper(WWTP_NAME)) %>% 
+  group_by(WWTP_NAME) %>% 
+  summarize(count = n()) %>% 
+  filter(count > 1) %>% 
+  arrange(desc(count))
+```
+Confirm number of nulls in the name
+
+```{r}
+ww %>% 
+  summarize(name_nulls = sum(is.na(WWTP_NAME)))
+```
+Check to see if there are any null values for lat and long
+
+```{r}
+ww %>% 
+  summarize(lat_na = sum(is.na(LAT_WWTP)),
+            lon_na = sum(is.na(LON_WWTP)))
 ```
 
