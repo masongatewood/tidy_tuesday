@@ -64,3 +64,32 @@ ww %>%
   geom_point()
 ```
 
+That plot doesn't really look correct, let's see what countries are included in the dataset.
+
+```{r}
+ww %>% 
+  distinct(COUNTRY) %>% 
+  arrange(COUNTRY)
+```
+Load in sf and leaflet to convert lat long to points and plot them
+
+```{r}
+library(sf)
+library(leaflet)
+
+sdf <- st_as_sf(ww, coords = c('LON_WWTP', 'LAT_WWTP'))
+
+st_geometry(sdf)
+```
+
+```{r}
+plot(sdf$geometry)
+```
+
+```{r}
+leaflet(sdf) %>% 
+  addTiles() %>% 
+  addMarkers(clusterOptions = markerClusterOptions())
+```
+
+
