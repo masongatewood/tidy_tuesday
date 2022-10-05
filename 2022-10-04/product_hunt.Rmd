@@ -1,0 +1,68 @@
+---
+title: "product_hunt"
+author: "Mason Gatewood"
+date: '2022-10-04'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+library(lubridate)
+library(ggthemes)
+
+tuesdata <- tidytuesdayR::tt_load('2022-10-04')
+product_hunt <- tuesdata$product_hunt
+```
+
+```{r}
+head(product_hunt)
+```
+Look at summary statistics for release date just to see what the range is
+
+```{r}
+summary(product_hunt$release_date)
+```
+
+This data isn't super interesting to me so I think I'm just going to make a basic plot showing number of products released over time and call it a day
+
+First going to check for any NAs in id, which I will use to make the count variable
+
+```{r}
+product_hunt %>% 
+  summarize(num_na = sum(is.na(id)))
+```
+
+```{r}
+year_count <- product_hunt %>% 
+  mutate(year = year(ymd(release_date))) %>% 
+  group_by(year) %>% 
+  summarize(count = n())
+
+count_mean <- mean(year_count$count)
+count_mean
+```
+
+
+```{r}
+products_by_year <- product_hunt %>% 
+  mutate(year = year(ymd(release_date))) %>% 
+  group_by(year) %>% 
+  summarize(count = n()) %>% 
+  ggplot(aes(x = year, y = count)) +
+  geom_col(fill = '#4c0f3a') +
+  geom_hline(yintercept = count_mean, color = '#7f7e6d') +
+  theme_tufte() +
+  xlab("Year") +
+  ylab("Count") +
+  labs(title = "Number of Products Released by Year")
+
+ggsave('products_by_year.png', plot = products_by_year, path = '/Users/masongatewood/RProjects/tidy_tuesday/2022-10-04')
+```
+
+
+
